@@ -136,7 +136,8 @@
 
             const dayTotal = hotelPrice + agentFeePerDay;
             const subtotal = dayTotal * days;
-            const platformFee = subtotal * platformRate;
+            const platformFeeRaw = subtotal * platformRate;
+            const platformFee = Math.ceil(platformFeeRaw);
             const total = subtotal + platformFee;
 
             const resultHtml = `
@@ -146,7 +147,7 @@
                 每天合计：<b>${dayTotal.toFixed(2)}</b> 元<br>
                 入住天数：<b>${days}</b> 天<br>
                 小计：<b>${subtotal.toFixed(2)}</b> 元 (${dayTotal.toFixed(2)}元 × ${days}天)<br>
-                平台手续费：<b>${platformFee.toFixed(2)}</b> 元 (1.6%)<br>
+                平台手续费：<b>${platformFee}</b> 元 (原值${platformFeeRaw.toFixed(2)}元，向上取整)<br>
                 <hr>
                 <strong>总价：<span style="color:#0078d7;">${total.toFixed(2)} 元</span></strong>
             `;
@@ -156,11 +157,24 @@
         }
 
         function copyResult() {
-            const resultDiv = document.getElementById('result');
-            // 提取纯文本内容
-            const temp = document.createElement('div');
-            temp.innerHTML = resultDiv.innerHTML;
-            const text = temp.innerText.replace(/\n{2,}/g, '\n');
+            const hotelPrice = parseFloat(document.getElementById('hotelPrice').value) || 0;
+            const days = parseInt(document.getElementById('days').value) || 0;
+            const agentFeePerDay = 5;
+            const dayTotal = hotelPrice + agentFeePerDay;
+            const subtotal = dayTotal * days;
+            const platformRate = 0.016;
+            const platformFee = Math.ceil(subtotal * platformRate);
+            const total = subtotal + platformFee;
+            // 生成简洁明了的拷贝内容
+            const text =
+`【酒店价格计算明细】
+每天酒店价格：${hotelPrice.toFixed(2)} 元
+每天代订费：${agentFeePerDay.toFixed(2)} 元
+每天合计：${dayTotal.toFixed(2)} 元
+入住天数：${days} 天
+小计：${subtotal.toFixed(2)} 元
+平台手续费：${platformFee} 元
+总价：${total.toFixed(2)} 元`;
             navigator.clipboard.writeText(text).then(() => {
                 const btn = document.getElementById('copyBtn');
                 const oldText = btn.innerText;
