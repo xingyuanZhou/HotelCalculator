@@ -109,8 +109,8 @@
 <body>
     <div class="container">
         <h2>酒店价格计算工具</h2>
-        <label for="hotelPrice">酒店价格 (元)</label>
-        <input type="number" id="hotelPrice" min="0" step="0.01" placeholder="请输入酒店价格">
+        <label for="hotelPrice">酒店总价格 (元)</label>
+        <input type="number" id="hotelPrice" min="0" step="0.01" placeholder="请输入酒店总价格">
 
         <label for="days">入住天数</label>
         <input type="number" id="days" min="1" step="1" placeholder="请输入入住天数">
@@ -122,32 +122,31 @@
     </div>
     <script>
         function calculate() {
-            const hotelPrice = parseFloat(document.getElementById('hotelPrice').value) || 0;
+            const hotelTotal = parseFloat(document.getElementById('hotelPrice').value) || 0;
             const days = parseInt(document.getElementById('days').value) || 0;
             const agentFeePerDay = 5;
             const platformRate = 0.016;
 
-            if (hotelPrice <= 0 || days <= 0) {
+            if (hotelTotal <= 0 || days <= 0) {
                 document.getElementById('result').style.display = 'block';
-                document.getElementById('result').innerHTML = '<span style="color:red;">请输入有效的酒店价格和入住天数！</span>';
+                document.getElementById('result').innerHTML = '<span style="color:red;">请输入有效的酒店总价格和入住天数！</span>';
                 document.getElementById('copyBtn').style.display = 'none';
                 return;
             }
 
-            const dayTotal = hotelPrice + agentFeePerDay;
-            const subtotal = dayTotal * days;
+            const agentFee = days * agentFeePerDay;
+            const subtotal = hotelTotal + agentFee;
             const platformFeeRaw = subtotal * platformRate;
             const platformFee = Math.ceil(platformFeeRaw);
             const total = subtotal + platformFee;
 
             const resultHtml = `
                 <strong>计算明细：</strong><br>
-                每天酒店价格：<b>${hotelPrice.toFixed(2)}</b> 元<br>
-                每天代订费：<b>${agentFeePerDay.toFixed(2)}</b> 元<br>
-                每天合计：<b>${dayTotal.toFixed(2)}</b> 元<br>
+                酒店总价格：<b>${hotelTotal.toFixed(2)}</b> 元<br>
                 入住天数：<b>${days}</b> 天<br>
-                小计：<b>${subtotal.toFixed(2)}</b> 元 (${dayTotal.toFixed(2)}元 × ${days}天)<br>
-                平台手续费：<b>${platformFee}</b> 元 (原值${platformFeeRaw.toFixed(2)}元，向上取整)<br>
+                代订费：<b>${agentFee.toFixed(2)}</b> 元 (5元/天 × ${days}天)<br>
+                小计：<b>${subtotal.toFixed(2)}</b> 元<br>
+                平台手续费：<b>${platformFee}</b> 元 <span style="color:#888;font-size:15px;">（${subtotal.toFixed(2)} × 0.016 = ${platformFeeRaw.toFixed(2)} 元，向上取整）</span><br>
                 <hr>
                 <strong>总价：<span style="color:#0078d7;">${total.toFixed(2)} 元</span></strong>
             `;
@@ -157,24 +156,17 @@
         }
 
         function copyResult() {
-            const hotelPrice = parseFloat(document.getElementById('hotelPrice').value) || 0;
+            const hotelTotal = parseFloat(document.getElementById('hotelPrice').value) || 0;
             const days = parseInt(document.getElementById('days').value) || 0;
             const agentFeePerDay = 5;
-            const dayTotal = hotelPrice + agentFeePerDay;
-            const subtotal = dayTotal * days;
+            const agentFee = days * agentFeePerDay;
+            const subtotal = hotelTotal + agentFee;
             const platformRate = 0.016;
             const platformFee = Math.ceil(subtotal * platformRate);
             const total = subtotal + platformFee;
-            // 生成简洁明了的拷贝内容
+            // 拷贝内容：只展示最终总价和含/不含手续费的总价
             const text =
-`【酒店价格计算明细】
-每天酒店价格：${hotelPrice.toFixed(2)} 元
-每天代订费：${agentFeePerDay.toFixed(2)} 元
-每天合计：${dayTotal.toFixed(2)} 元
-入住天数：${days} 天
-小计：${subtotal.toFixed(2)} 元
-平台手续费：${platformFee} 元
-总价：${total.toFixed(2)} 元`;
+`总价：${total.toFixed(2)} 元  （含平台手续费：${platformFee} 元）\n总价：${subtotal.toFixed(2)} 元 （不含平台手续费）`;
             navigator.clipboard.writeText(text).then(() => {
                 const btn = document.getElementById('copyBtn');
                 const oldText = btn.innerText;
