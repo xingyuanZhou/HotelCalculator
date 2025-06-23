@@ -166,7 +166,7 @@
             const total = subtotal + platformFee;
             // 拷贝内容：模板为三行，含权益说明
             const text =
-`总价：\n        ${subtotal.toFixed(2)} 元 （不含平台手续费）建议\n        ${total.toFixed(2)} 元 （含平台手续费：${platformFee} 元）\n\n权益: 代订享受价格85折, 延迟到两点退房`;
+`总价：\n        方案一(建议)：${subtotal.toFixed(2)} 元 （不含平台手续费）\n        方案二：${total.toFixed(2)} 元 （含平台手续费：${platformFee} 元）\n\n权益: 代订享受价格85折, 延迟到两点退房`;
             navigator.clipboard.writeText(text).then(() => {
                 const btn = document.getElementById('copyBtn');
                 const oldText = btn.innerText;
